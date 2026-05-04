@@ -1,0 +1,16 @@
+hyperopt
+lightgbm
+matplotlib
+mlforecast
+neuralforecast==3.1.7
+numpy
+pandas
+pytorch-lightning==2.6.1
+scikit-learn
+seaborn
+statsforecast
+statsmodels
+torch
+torchmetrics==1.8.2
+window-ops
+xgboost
