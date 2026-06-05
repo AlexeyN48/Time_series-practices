@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Исследование ВР: Погода в Дели (2013–2017)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fefcf9;
+    --bg-alt: #f5f0e8;
+    --bg-dark: #1b1f13;
+    --text: #33362b;
+    --text-light: #737863;
+    --accent: #8b6834;
+    --accent2: #3a6b5e;
+    --accent3: #8c4356;
+    --accent4: #4a5d8a;
+    --border: #d8d1c4;
+    --border-dark: #b5ad9e;
+    --gold: #c5973e;
+    --radius: 6px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'IBM Plex Sans',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.8;
+    font-size:16.5px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ── HEADER: editorial magazine style ── */
+  .masthead {
+    background: var(--bg-alt);
+    border-bottom: 3px double var(--border-dark);
+    text-align: center;
+    padding: 20px 24px 14px;
+  }
+  .masthead-label {
+    font-family:'IBM Plex Sans',sans-serif;
+    font-weight:700;
+    font-size:.7rem;
+    text-transform:uppercase;
+    letter-spacing:.25em;
+    color:var(--text-light);
+  }
+
+  .title-block {
+    max-width:780px;
+    margin:0 auto;
+    padding:48px 24px 40px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+  }
+  .title-block h1 {
+    font-family:'DM Serif Display',serif;
+    font-size:clamp(2rem,5vw,3.2rem);
+    font-weight:400;
+    line-height:1.15;
+    color:var(--bg-dark);
+    margin-bottom:18px;
+  }
+  .title-block .lead {
+    font-size:1.1rem;
+    font-weight:300;
+    color:var(--text-light);
+    max-width:620px;
+    margin:0 auto 28px;
+    line-height:1.7;
+  }
+  .title-meta {
+    display:flex; flex-wrap:wrap; justify-content:center; gap:20px 36px;
+    font-size:.82rem; color:var(--text-light);
+  }
+  .title-meta strong { color:var(--text); font-weight:600; }
+
+  /* GitHub button */
+  .gh-btn {
+    display:inline-flex; align-items:center; gap:9px;
+    margin-top:24px;
+    padding:12px 26px;
+    background:var(--bg-dark);
+    color:#f5f0e8;
+    text-decoration:none;
+    font-size:.92rem;
+    font-weight:600;
+    border-radius:4px;
+    letter-spacing:.02em;
+    transition:all .2s;
+  }
+  .gh-btn:hover { background:#33362b; transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,0,0,.15); }
+  .gh-btn svg { flex-shrink:0; }
+
+  /* ── NAV ── */
+  .toc-bar {
+    max-width:780px; margin:0 auto;
+    padding:28px 24px;
+    border-bottom:1px solid var(--border);
+  }
+  .toc-bar h2 {
+    font-family:'DM Serif Display',serif;
+    font-size:.95rem;
+    font-weight:400;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:.15em;
+    margin-bottom:12px;
+  }
+  .toc-bar ol {
+    list-style:none; padding:0;
+    display:grid; grid-template-columns:1fr 1fr; gap:4px 32px;
+  }
+  .toc-bar li { counter-increment:toc; }
+  .toc-bar li::before {
+    content:counter(toc) ".";
+    display:inline-block; width:22px;
+    font-weight:600; color:var(--accent);
+    font-size:.85rem;
+  }
+  .toc-bar a { color:var(--text); text-decoration:none; font-size:.9rem; }
+  .toc-bar a:hover { color:var(--accent); }
+
+  /* ── MAIN ── */
+  main { max-width:780px; margin:0 auto; padding:0 24px; }
+  section { padding:44px 0; border-bottom:1px solid var(--border); }
+  section:last-child { border-bottom:none; }
+
+  /* Section numbering */
+  .sec-num {
+    font-family:'DM Serif Display',serif;
+    font-size:3.5rem;
+    color:var(--bg-alt);
+    -webkit-text-stroke:1.5px var(--border-dark);
+    line-height:1;
+    margin-bottom:4px;
+  }
+  h2.sec-title {
+    font-family:'DM Serif Display',serif;
+    font-size:1.65rem;
+    font-weight:400;
+    color:var(--bg-dark);
+    margin-bottom:20px;
+  }
+  h3 {
+    font-family:'DM Serif Display',serif;
+    font-size:1.15rem;
+    font-weight:400;
+    margin:32px 0 10px;
+    color:var(--bg-dark);
+    padding-bottom:6px;
+    border-bottom:1px dotted var(--border);
+  }
+  h4 {
+    font-weight:600; font-size:.95rem;
+    margin:22px 0 6px;
+    color:var(--accent2);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+
+  p { margin-bottom:14px; }
+  ul,ol { margin:0 0 14px 20px; }
+  li { margin-bottom:3px; }
+  a { color:var(--accent2); }
+
+  /* ── CALLOUTS (instead of colored-border cards) ── */
+  .callout {
+    margin:20px 0;
+    padding:20px 24px;
+    border-radius:var(--radius);
+    font-size:.95rem;
+  }
+  .callout-warm { background:#fdf5eb; border:1px solid #ecdcc6; }
+  .callout-cool { background:#eef4f2; border:1px solid #c8dad5; }
+  .callout-note { background:#f0edf6; border:1px solid #d4cde3; }
+  .callout-alert { background:#fdf0f0; border:1px solid #e8cbcb; }
+  .callout-neutral { background:var(--bg-alt); border:1px solid var(--border); }
+  .callout strong { color:var(--bg-dark); }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x:auto; margin:18px 0; }
+  table { width:100%; border-collapse:collapse; font-size:.88rem; }
+  thead th {
+    background:var(--bg-alt);
+    padding:11px 14px;
+    text-align:left;
+    font-weight:600;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--text-light);
+    border-bottom:2px solid var(--border-dark);
+  }
+  td {
+    padding:10px 14px;
+    border-bottom:1px solid var(--border);
+  }
+  tbody tr:hover { background:rgba(139,104,52,.04); }
+  .best { color:var(--accent); font-weight:700; }
+  .good { color:var(--accent2); font-weight:600; }
+  .warn { color:var(--accent3); font-weight:600; }
+
+  /* ── CODE ── */
+  code {
+    font-family:'IBM Plex Mono',monospace;
+    font-size:.86em;
+    background:var(--bg-alt);
+    padding:2px 6px;
+    border-radius:3px;
+    border:1px solid var(--border);
+  }
+  pre {
+    background:var(--bg-dark);
+    color:#d4d2c8;
+    padding:18px 22px;
+    border-radius:var(--radius);
+    overflow-x:auto;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:.83rem;
+    line-height:1.6;
+    margin:14px 0;
+  }
+  pre code { background:none; padding:0; color:inherit; border:none; }
+
+  /* ── TAGS ── */
+  .tag {
+    display:inline-block;
+    padding:2px 9px;
+    border-radius:3px;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    vertical-align:middle;
+  }
+  .tag-stat { background:#e8dfd0; color:#6b5630; }
+  .tag-ml { background:#d1e6df; color:#2a5c4a; }
+  .tag-dl { background:#ddd5e8; color:#5a3d75; }
+  .tag-base { background:#e8d8c4; color:#7a5c30; }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:1px;
+    margin:24px 0;
+    background:var(--border);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .kpi-item {
+    background:var(--bg);
+    padding:18px 16px;
+    text-align:center;
+  }
+  .kpi-item .num {
+    font-family:'DM Serif Display',serif;
+    font-size:1.7rem;
+    color:var(--accent);
+  }
+  .kpi-item .lbl {
+    font-size:.75rem; color:var(--text-light);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-top:2px;
+  }
+
+  /* ── METRIC BARS ── */
+  .bar-row { display:flex; align-items:center; gap:10px; margin:5px 0; }
+  .bar-row .nm { width:130px; font-weight:500; font-size:.86rem; text-align:right; }
+  .bar-row .track { flex:1; height:18px; background:var(--bg-alt); border-radius:9px; overflow:hidden; border:1px solid var(--border); }
+  .bar-row .fill { height:100%; border-radius:9px; }
+  .bar-row .val { width:70px; font-family:'IBM Plex Mono',monospace; font-size:.82rem; font-weight:600; }
+
+  /* ── PIPELINE ── */
+  .pipe {
+    display:flex; align-items:center; justify-content:center;
+    gap:0; margin:24px 0; flex-wrap:wrap;
+  }
+  .pipe-step {
+    background:var(--bg-dark);
+    color:#e8e2d6;
+    padding:14px 22px;
+    border-radius:var(--radius);
+    text-align:center;
+    min-width:150px;
+    font-size:.86rem; font-weight:600;
+  }
+  .pipe-step small { display:block; font-weight:400; opacity:.65; font-size:.76rem; margin-top:3px; }
+  .pipe-step.pipe-final { background:var(--accent); color:#fff; }
+  .pipe-arr { font-size:1.4rem; color:var(--gold); margin:0 6px; }
+
+  /* ── IMAGES ── */
+  .fig { margin:24px 0; text-align:center; }
+  .fig img {
+    max-width:100%;
+    border-radius:var(--radius);
+    border:1px solid var(--border);
+  }
+  .fig figcaption {
+    margin-top:8px;
+    font-size:.8rem; color:var(--text-light);
+    font-style:italic;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align:center;
+    padding:36px 24px;
+    color:var(--text-light);
+    font-size:.82rem;
+    border-top:3px double var(--border-dark);
+    margin-top:40px;
+    background:var(--bg-alt);
+  }
+  footer .foot-gh {
+    display:inline-flex; align-items:center; gap:8px;
+    margin:12px 0;
+    padding:10px 22px;
+    background:var(--bg-dark);
+    color:#e8e2d6;
+    border-radius:4px;
+    font-weight:600; font-size:.88rem;
+    text-decoration:none;
+    transition:all .2s;
+  }
+  footer .foot-gh:hover { background:#33362b; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width:640px) {
+    .title-block { padding:32px 16px 28px; }
+    .toc-bar ol { grid-template-columns:1fr; }
+    .pipe { flex-direction:column; gap:4px; }
+    .pipe-arr { transform:rotate(90deg); }
+    .kpi-strip { grid-template-columns:repeat(2,1fr); }
+    th,td { padding:8px 8px; font-size:.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ MASTHEAD ═══════════ -->
+<div class="masthead">
+  <span class="masthead-label">Отчёт об исследовании временного ряда</span>
+</div>
+
+<!-- ═══════════ TITLE ═══════════ -->
+<div class="title-block">
+  <h1>Погода в Дели: прогнозирование среднесуточной температуры (2013–2017)</h1>
+  <p class="lead">Комплексный анализ от EDA и выявления аномалий до сравнения 13 методов прогнозирования — статистика, ML, DL — и построения production-ready пайплайна</p>
+  <div class="title-meta">
+    <span><strong>Данные:</strong> Daily Delhi Climate (Kaggle)</span>
+    <span><strong>Период:</strong> 01.01.2013 — 24.04.2017</span>
+    <span><strong>Наблюдений:</strong> 1 576</span>
+  </div>
+  <a href="https://github.com/AlexeyN48/Time_series-practices" target="_blank" class="gh-btn">
+    <svg height="22" width="22" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    Открыть репозиторий на GitHub
+  </a>
+</div>
+
+<!-- ═══════════ TOC ═══════════ -->
+<nav class="toc-bar">
+  <h2>Содержание</h2>
+  <ol>
+    <li><a href="#s1">Описание временного ряда</a></li>
+    <li><a href="#s2">Постановка задачи</a></li>
+    <li><a href="#s3">Разведочный анализ (EDA)</a></li>
+    <li><a href="#s4">Анализ аномалий</a></li>
+    <li><a href="#s5">Таблица выбора методов анализа ВР</a></li>
+    <li><a href="#s6">Пайплайн решения задачи</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ═══════════ 1. ОПИСАНИЕ ═══════════ -->
+<section id="s1">
+  <div class="sec-num">01</div>
+  <h2 class="sec-title">Описание временного ряда</h2>
+
+  <div class="callout callout-warm">
+    <strong>Источник данных:</strong> <a href="https://www.kaggle.com/sumanthvrao/daily-climate-time-series-data" target="_blank">Daily Delhi Climate (Kaggle)</a> — ежедневные замеры погодных условий в Дели, Индия, за период с 1 января 2013 по 24 апреля 2017 года.
+  </div>
+
+  <div class="kpi-strip">
+    <div class="kpi-item"><div class="num">1 576</div><div class="lbl">наблюдений</div></div>
+    <div class="kpi-item"><div class="num">Daily</div><div class="lbl">частота</div></div>
+    <div class="kpi-item"><div class="num">meantemp</div><div class="lbl">целевая (°C)</div></div>
+    <div class="kpi-item"><div class="num">3</div><div class="lbl">экзогенных</div></div>
+  </div>
+
+  <h3>Характеристики набора данных</h3>
+  <p><strong>Целевая переменная (<code>target</code>):</strong> <code>meantemp</code> — среднесуточная температура воздуха в °C.</p>
+  <p><strong>Экзогенные признаки:</strong></p>
+  <ul>
+    <li><code>humidity</code> — влажность воздуха</li>
+    <li><code>wind_speed</code> — скорость ветра</li>
+    <li><code>meanpressure</code> — атмосферное давление</li>
+  </ul>
+</section>
+
+<!-- ═══════════ 2. ПОСТАНОВКА ЗАДАЧИ ═══════════ -->
+<section id="s2">
+  <div class="sec-num">02</div>
+  <h2 class="sec-title">Постановка задачи</h2>
+
+  <div class="callout callout-cool">
+    <strong>Цель:</strong> Построение модели для прогнозирования среднесуточной температуры на основе исторических данных и сопутствующих метеорологических факторов.
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+      <tbody>
+        <tr><td>Тип задачи</td><td>Прогнозирование одномерного ВР с экзогенными признаками</td></tr>
+        <tr><td>Горизонт</td><td>30 дней (среднесрочный прогноз)</td></tr>
+        <tr><td>Разбивка данных</td><td>Train: до 2017-03-25 (1545 набл.) / Test: 30 набл.</td></tr>
+        <tr><td>Валидация</td><td>Temporal cross-validation, 3 скользящих окна, шаг 30 дней</td></tr>
+        <tr><td>Метрика MAE</td><td>Оценка ошибки прогноза в °C</td></tr>
+        <tr><td>Метрика RMSE</td><td>Выявление крупных отклонений</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ 3. EDA ═══════════ -->
+<section id="s3">
+  <div class="sec-num">03</div>
+  <h2 class="sec-title">Разведочный анализ (EDA)</h2>
+
+  <p>В ходе анализа выявлены следующие ключевые особенности временного ряда:</p>
+
+  <h4>Сезонность</h4>
+  <p>Ярко выраженная <strong>годовая аддитивная сезонность</strong>. Пики температуры приходятся на май–июнь (~35°C), минимумы — на декабрь–январь (~12°C). Амплитуда сезонных колебаний составляет ~23°C.</p>
+
+  <h4>Тренд</h4>
+  <p>Наблюдается слабый положительный линейный тренд — среднегодовое повышение температуры. Значимость тренда подтверждается при анализе остатков после сезонной декомпозиции.</p>
+
+  <h4>Стационарность</h4>
+  <div class="callout callout-alert">
+    Ряд является <strong>нестационарным</strong>: тест Дики–Фуллера (ADF) даёт статистику = −2.44, p-value = 0.131 — нулевая гипотеза не отвергается. После взятия 1-й разности: p-value ≈ 0.000 → ряд становится стационарным.
+  </div>
+
+  <h4>Корреляция</h4>
+  <p>Выявлена сильная <strong>обратная корреляция</strong> между температурой и влажностью (r ≈ −0.57). Атмосферное давление также коррелирует с температурой, что подтверждает целесообразность мультивариатного подхода.</p>
+
+  <h3>Анализ ACF / PACF</h3>
+  <p>На дифференцированном ряду: ACF обрезается после лага 1–2 (q = 2), PACF обрезается после лага 1–2 (p = 2). Сезонный период 365 дней подтверждён спектральным анализом, однако для SARIMA использован недельный период (7) ввиду вычислительных ограничений.</p>
+</section>
+
+<!-- ═══════════ 4. АНОМАЛИИ ═══════════ -->
+<section id="s4">
+  <div class="sec-num">04</div>
+  <h2 class="sec-title">Анализ аномалий</h2>
+
+  <p>Выявление аномалий проведено тремя принципиально различными методами. Все применялись к обучающей выборке до обучения прогностических моделей.</p>
+
+  <!-- IQR -->
+  <h3>4.1 Метод IQR <span class="tag tag-stat">Статистический</span></h3>
+  <p><strong>Принцип:</strong> Точка считается аномалией, если выходит за пределы [Q1 − 1.5·IQR, Q3 + 1.5·IQR].</p>
+  <p><strong>Обоснование:</strong> Непараметрический, не требует обучения. Границы: нижняя ≈ 5.4°C, верхняя ≈ 37.7°C.</p>
+  <p><strong>Результат:</strong> Обнаружено <strong>8 аномалий</strong> — экстремально холодные дни зимой (t &lt; 5°C).</p>
+  <p>Дополнительно обнаружена критическая аномалия в <code>meanpressure</code>: значения ~59 ед. при норме ~1000 (сбой датчика). Аномальные значения заменены медианой.</p>
+
+  <!-- Isolation Forest -->
+  <h3>4.2 Isolation Forest <span class="tag tag-ml">ML, ансамбль</span></h3>
+  <p><strong>Принцип:</strong> Аномальные точки изолируются быстрее (короче путь в дереве).</p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Параметр</th><th>Значение</th><th>Обоснование</th></tr></thead>
+      <tbody>
+        <tr><td><code>contamination</code></td><td>0.03</td><td>~3% аномалий по EDA</td></tr>
+        <tr><td><code>n_estimators</code></td><td>200</td><td>Стабильность на 1500 набл.</td></tr>
+        <tr><td><code>random_state</code></td><td>42</td><td>Воспроизводимость</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>Признаки:</strong> <code>y</code>, <code>lag_1</code>, <code>lag_7</code>, <code>lag_30</code>, <code>rolling_mean_7</code> (стандартизированные).</p>
+  <p><strong>Результат:</strong> <strong>44 аномалии</strong> (~3%) — включая локальные отклонения, невидимые по абсолютному значению.</p>
+
+  <!-- DBSCAN -->
+  <h3>4.3 DBSCAN <span class="tag tag-ml">ML, кластеризация</span></h3>
+  <p><strong>Принцип:</strong> Кластеризация по плотности; точки вне плотных кластеров — аномалии.</p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Параметр</th><th>Значение</th><th>Обоснование</th></tr></thead>
+      <tbody>
+        <tr><td><code>eps</code></td><td>1.5</td><td>«Колено» k-distance графика (k=5)</td></tr>
+        <tr><td><code>min_samples</code></td><td>5</td><td>Минимальный размер плотного кластера</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>Признаки:</strong> <code>y</code>, <code>rolling_mean_14</code>, <code>deviation</code>, <code>lag_1</code> (стандартизированные).</p>
+  <p><strong>Результат:</strong> <strong>23 аномалии</strong>, 4 кластера. Эффективен в переходные периоды (весна/осень).</p>
+
+  <!-- Сравнение -->
+  <h3>4.4 Сравнение методов</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Метод</th><th>Тип</th><th>Аномалий</th><th>Принцип</th><th>Обучение</th></tr></thead>
+      <tbody>
+        <tr><td><strong>IQR</strong></td><td>Univariate, стат.</td><td>8</td><td>Глобальный диапазон</td><td>Нет</td></tr>
+        <tr><td><strong>Isolation Forest</strong></td><td>ML, ансамбль</td><td>44</td><td>Изоляция в многомерном пр-ве</td><td>Без учителя</td></tr>
+        <tr><td><strong>DBSCAN</strong></td><td>ML, кластеризация</td><td>23</td><td>Плотность соседей</td><td>Без учителя</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout callout-warm">
+    <strong>Консенсус:</strong> 5 точек найдены одновременно IQR и Isolation Forest (экстремально холодные дни января 2014–2015). Для продакшна рекомендуется подтверждение аномалии ≥2 методами.
+  </div>
+</section>
+
+<!-- ═══════════ 5. ТАБЛИЦА МЕТОДОВ ═══════════ -->
+<section id="s5">
+  <div class="sec-num">05</div>
+  <h2 class="sec-title">Таблица выбора методов анализа ВР</h2>
+
+  <p>Сводная таблица: 1 бейзлайн + 6 статистических + 3 ML + 3 DL — с комментариями по параметрам и анализу результатов.</p>
+
+  <!-- BASELINE -->
+  <h3>5.1 Бейзлайн</h3>
+  <div class="callout callout-neutral">
+    <strong>SeasonalNaive</strong> <span class="tag tag-base">baseline</span> — прогноз равен значению ровно год назад. MAE (Test)&nbsp;=&nbsp;2.050, RMSE&nbsp;=&nbsp;2.522, MAE (CV)&nbsp;=&nbsp;2.678. Необходим как нижняя граница качества. Неожиданно конкурентоспособен благодаря стабильному годовому циклу температур в Дели.
+  </div>
+
+  <!-- STAT -->
+  <h3>5.2 Статистические методы (6)</h3>
+  <p>Фреймворк: <code>statsforecast</code> (Nixtla). Валидация: бектестинг, 3 скользящих окна, шаг 30 дней.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Модель</th><th>Режим</th><th>MAE (Test)</th><th>RMSE (Test)</th><th>MAE (CV)</th><th>Комментарий</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>1</td><td><strong>MSTL([7,365])</strong> <span class="tag tag-stat">Стат.</span></td><td>Ручной</td>
+          <td class="best">2.054</td><td class="best">2.417</td><td>2.887</td>
+          <td>Двойная сезонность (недельная+годовая), тренд-прогнозировщик AutoETS("ZZN"). Лучший RMSE среди стат. методов. Выбрана как бейзлайн для ML/DL.</td>
+        </tr>
+        <tr>
+          <td>2</td><td><strong>ARIMA(2,1,2)(1,1,0)[7]</strong> <span class="tag tag-stat">Стат.</span></td><td>Ручной</td>
+          <td>2.367</td><td>2.855</td><td>2.506</td>
+          <td>Параметры по ADF (d=1), ACF/PACF (p=2, q=2). Сезонный период 7 вместо 365 из-за вычислительных ограничений. Превзошла AutoARIMA на тесте.</td>
+        </tr>
+        <tr>
+          <td>3</td><td><strong>AutoTheta</strong> <span class="tag tag-stat">Стат.</span></td><td>Авто</td>
+          <td>2.922</td><td>3.266</td><td>3.918</td>
+          <td>Победитель M3. Стабильная точность на среднесрочных горизонтах без ручной настройки.</td>
+        </tr>
+        <tr>
+          <td>4</td><td><strong>AutoCES</strong> <span class="tag tag-stat">Стат.</span></td><td>Авто</td>
+          <td>3.032</td><td>3.336</td><td>2.805</td>
+          <td>Complex Exponential Smoothing — захватывает квазипериодические структуры. Хороший CV, проигрывает на тесте.</td>
+        </tr>
+        <tr>
+          <td>5</td><td><strong>AutoETS</strong> <span class="tag tag-stat">Стат.</span></td><td>Авто</td>
+          <td>3.721</td><td>4.213</td><td>2.538</td>
+          <td>30 комбинаций по AIC. Переобучение: лучший CV (2.54), но плохой Test (3.72).</td>
+        </tr>
+        <tr>
+          <td>6</td><td><strong>AutoARIMA[7]</strong> <span class="tag tag-stat">Стат.</span></td><td>Авто</td>
+          <td class="warn">3.948</td><td class="warn">4.479</td><td class="good">2.326</td>
+          <td>Автоподбор по AIC (Hyndman–Khandakar). Лучший CV=2.33, но худший Test=3.95. Классическое переобучение.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-note">
+    <strong>Все модели не прошли тест Льюнга–Бокса</strong> — остатки не являются белым шумом. Причина: нелинейные зависимости и экзогенные факторы, не учитываемые одномерными стат. моделями. Это мотивирует переход к ML/DL.
+  </div>
+
+  <!-- ML -->
+  <h3>5.3 Методы машинного обучения (3)</h3>
+  <p>Фреймворк: <code>mlforecast</code>. Feature Engineering: 15 лагов, скользящие статистики (7/14/30/90 дней), 7 календарных признаков, первая разность.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Модель</th><th>MAE (Test)</th><th>RMSE (Test)</th><th>MAE (CV)</th><th>Δ vs MSTL</th><th>Комментарий</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>1</td><td><strong>LightGBM</strong> <span class="tag tag-ml">ML</span></td>
+          <td class="best">1.459</td><td class="best">1.745</td><td>2.478</td><td class="best">−29%</td>
+          <td><code>n_estimators=1000</code>, <code>lr=0.05</code>, <code>num_leaves=31</code>. Лучшая модель в целом. Топ-признаки: lag_1, lag_365, dayofyear.</td>
+        </tr>
+        <tr>
+          <td>2</td><td><strong>XGBoost</strong> <span class="tag tag-ml">ML</span></td>
+          <td>2.295</td><td>2.789</td><td>2.580</td><td>+14%</td>
+          <td><code>n_estimators=1000</code>, <code>lr=0.05</code>, <code>max_depth=15</code>. Level-wise рост деревьев. Незначительно уступает LightGBM.</td>
+        </tr>
+        <tr>
+          <td>3</td><td><strong>Ridge Regression</strong> <span class="tag tag-ml">ML</span></td>
+          <td>3.410</td><td>3.709</td><td>2.435</td><td>+45%</td>
+          <td><code>alpha=1.0</code>. Линейный бейзлайн — подтверждает значимость нелинейных взаимодействий.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DL -->
+  <h3>5.4 Методы глубокого обучения (3)</h3>
+  <p>Фреймворк: <code>neuralforecast</code>. Все модели: h=30, input_size=60 (2×h), max_steps=1500, loss=MAE, scaler=standard.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Модель</th><th>MAE (Test)</th><th>RMSE (Test)</th><th>MAE (CV)</th><th>Δ vs MSTL</th><th>Комментарий</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>1</td><td><strong>NHITS</strong> <span class="tag tag-dl">DL</span></td>
+          <td class="good">2.618</td><td>3.369</td><td>1.521</td><td>+29%</td>
+          <td>MLP + иерархическая интерполяция. Лучший DL-метод; разделяет долгосрочные и краткосрочные компоненты.</td>
+        </tr>
+        <tr>
+          <td>2</td><td><strong>LSTM</strong> <span class="tag tag-dl">DL</span></td>
+          <td>2.781</td><td>3.739</td><td>2.781</td><td>+35%</td>
+          <td>Рекуррентная сеть с вентилями памяти. На 1545 набл. страдает от переобучения из-за числа параметров.</td>
+        </tr>
+        <tr>
+          <td>3</td><td><strong>NBEATS</strong> <span class="tag tag-dl">DL</span></td>
+          <td>2.869</td><td>3.614</td><td>2.869</td><td>+33%</td>
+          <td>Трендовый (полином.) и сезонный (Фурье) базис. Победитель M4. Главное преимущество — интерпретируемость.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- СВОДНАЯ -->
+  <h3>5.5 Сводная таблица: все 13 методов (по MAE Test)</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Модель</th><th>Тип</th><th>MAE (CV)</th><th>RMSE (CV)</th><th>MAE (Test)</th><th>RMSE (Test)</th><th>Δ vs MSTL</th></tr></thead>
+      <tbody>
+        <tr style="background:rgba(139,104,52,.07);"><td>🥇</td><td><strong>LightGBM</strong></td><td><span class="tag tag-ml">ML</span></td><td>2.478</td><td>2.950</td><td class="best">1.459</td><td class="best">1.745</td><td class="best">−29%</td></tr>
+        <tr><td>2</td><td>SeasonalNaive</td><td><span class="tag tag-base">Base</span></td><td>2.678</td><td>3.182</td><td>2.050</td><td>2.522</td><td>—</td></tr>
+        <tr><td>3</td><td>MSTL</td><td><span class="tag tag-stat">Стат.</span></td><td>2.887</td><td>3.431</td><td>2.054</td><td>2.417</td><td>—</td></tr>
+        <tr><td>4</td><td>XGBoost</td><td><span class="tag tag-ml">ML</span></td><td>2.580</td><td>3.092</td><td>2.295</td><td>2.789</td><td>+14%</td></tr>
+        <tr><td>5</td><td>ARIMA (ручн.)</td><td><span class="tag tag-stat">Стат.</span></td><td>2.506</td><td>—</td><td>2.367</td><td>2.855</td><td>+15%</td></tr>
+        <tr><td>6</td><td>NHITS</td><td><span class="tag tag-dl">DL</span></td><td>1.521</td><td>1.876</td><td>2.618</td><td>3.369</td><td>+29%</td></tr>
+        <tr><td>7</td><td>LSTM</td><td><span class="tag tag-dl">DL</span></td><td>2.781</td><td>3.739</td><td>2.781</td><td>3.739</td><td>+35%</td></tr>
+        <tr><td>8</td><td>NBEATS</td><td><span class="tag tag-dl">DL</span></td><td>2.869</td><td>3.614</td><td>2.869</td><td>3.614</td><td>+33%</td></tr>
+        <tr><td>9</td><td>AutoTheta</td><td><span class="tag tag-stat">Стат.</span></td><td>3.918</td><td>—</td><td>2.922</td><td>3.266</td><td>+42%</td></tr>
+        <tr><td>10</td><td>AutoCES</td><td><span class="tag tag-stat">Стат.</span></td><td>2.805</td><td>—</td><td>3.032</td><td>3.336</td><td>+48%</td></tr>
+        <tr><td>11</td><td>Ridge</td><td><span class="tag tag-ml">ML</span></td><td>2.435</td><td>3.010</td><td>3.410</td><td>3.709</td><td>+45%</td></tr>
+        <tr><td>12</td><td>AutoETS</td><td><span class="tag tag-stat">Стат.</span></td><td>2.538</td><td>—</td><td>3.721</td><td>4.213</td><td>+81%</td></tr>
+        <tr><td>13</td><td>AutoARIMA</td><td><span class="tag tag-stat">Стат.</span></td><td>2.326</td><td>—</td><td>3.948</td><td>4.479</td><td>+92%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Bars -->
+  <h3>5.6 Визуализация MAE (Test)</h3>
+  <div style="margin:16px 0;">
+    <div class="bar-row"><span class="nm">LightGBM</span><div class="track"><div class="fill" style="width:33%;background:var(--accent);"></div></div><span class="val best">1.459</span></div>
+    <div class="bar-row"><span class="nm">SeasonalNaive</span><div class="track"><div class="fill" style="width:46%;background:var(--gold);"></div></div><span class="val">2.050</span></div>
+    <div class="bar-row"><span class="nm">MSTL</span><div class="track"><div class="fill" style="width:46%;background:var(--accent4);"></div></div><span class="val">2.054</span></div>
+    <div class="bar-row"><span class="nm">XGBoost</span><div class="track"><div class="fill" style="width:51%;background:var(--accent2);"></div></div><span class="val">2.295</span></div>
+    <div class="bar-row"><span class="nm">ARIMA (ручн.)</span><div class="track"><div class="fill" style="width:53%;background:var(--accent4);"></div></div><span class="val">2.367</span></div>
+    <div class="bar-row"><span class="nm">NHITS</span><div class="track"><div class="fill" style="width:58%;background:#7d5fa0;"></div></div><span class="val">2.618</span></div>
+    <div class="bar-row"><span class="nm">LSTM</span><div class="track"><div class="fill" style="width:62%;background:#7d5fa0;"></div></div><span class="val">2.781</span></div>
+    <div class="bar-row"><span class="nm">NBEATS</span><div class="track"><div class="fill" style="width:64%;background:#7d5fa0;"></div></div><span class="val">2.869</span></div>
+    <div class="bar-row"><span class="nm">AutoTheta</span><div class="track"><div class="fill" style="width:65%;background:var(--accent4);"></div></div><span class="val">2.922</span></div>
+    <div class="bar-row"><span class="nm">AutoCES</span><div class="track"><div class="fill" style="width:68%;background:var(--accent4);"></div></div><span class="val">3.032</span></div>
+    <div class="bar-row"><span class="nm">Ridge</span><div class="track"><div class="fill" style="width:76%;background:var(--accent2);"></div></div><span class="val">3.410</span></div>
+    <div class="bar-row"><span class="nm">AutoETS</span><div class="track"><div class="fill" style="width:83%;background:var(--accent4);"></div></div><span class="val">3.721</span></div>
+    <div class="bar-row"><span class="nm">AutoARIMA</span><div class="track"><div class="fill" style="width:88%;background:var(--accent4);"></div></div><span class="val warn">3.948</span></div>
+  </div>
+
+  <!-- Выводы -->
+  <h3>5.7 Ключевые выводы</h3>
+  <div class="callout callout-warm">
+    <p><strong>ML-подход выигрывает</strong> благодаря явной инженерии признаков: сезонность кодируется через <code>lag_365</code> и <code>dayofyear</code>.</p>
+    <p><strong>DL-подходы</strong> (NHITS, NBEATS) конкурентоспособны и не требуют ручного Feature Engineering — преимущество при работе с новыми рядами.</p>
+    <p><strong>Статистические методы</strong> (MSTL, SeasonalNaive) — сильные конкуренты для структурированных сезонных рядов при малом объёме данных.</p>
+    <p style="margin-bottom:0;"><strong>Финальная модель: LightGBM</strong> (MAE = 1.459°C, RMSE = 1.745°C).</p>
+  </div>
+</section>
+
+<!-- ═══════════ 6. ПАЙПЛАЙН ═══════════ -->
+<section id="s6">
+  <div class="sec-num">06</div>
+  <h2 class="sec-title">Пайплайн решения задачи ВР</h2>
+
+  <p>Реализован как единый объект <code>sklearn.Pipeline</code> из 4 последовательных трансформеров + финальный регрессор. Гарантирует отсутствие утечки данных, воспроизводимость и тестируемость.</p>
+
+  <h3>6.1 Архитектура</h3>
+  <div class="pipe">
+    <div class="pipe-step">TimeSeriesLoader<small>Загрузка + индексация</small></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step">AnomalyCleaner<small>IQR-очистка давления</small></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step">FeatureEngineer<small>Лаги + скользящие + календарь</small></div>
+    <span class="pipe-arr">→</span>
+    <div class="pipe-step pipe-final">LGBMRegressor<small>Финальная модель</small></div>
+  </div>
+
+  <h3>6.2 Описание этапов</h3>
+
+  <h4>TimeSeriesLoader</h4>
+  <p>Загрузка и объединение train/test в единый DataFrame. Преобразование <code>date</code> в <code>DatetimeIndex</code> с частотой <code>'D'</code>. Заполнение пропусков через forward fill.</p>
+
+  <h4>AnomalyCleaner</h4>
+  <p>Обработка аномалий давления методом IQR. Значения <code>meanpressure</code> ~59 (при норме ~1000) заменяются медианой.</p>
+
+  <h4>FeatureEngineer</h4>
+  <p>Лаги: [1,2,3,4,5,6,7,14,21,28,30,60,90,180,365]. Скользящие: mean/std/min/max для окон 7/14/30/90 дней. Календарь: dayofweek, month, dayofyear, week, quarter, is_month_start, is_month_end. Первая разность для стационарности.</p>
+
+  <h4>LGBMRegressor</h4>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Параметр</th><th>Значение</th><th>Обоснование</th></tr></thead>
+      <tbody>
+        <tr><td><code>n_estimators</code></td><td>500</td><td>Баланс точности и скорости</td></tr>
+        <tr><td><code>learning_rate</code></td><td>0.05</td><td>Снижение переобучения</td></tr>
+        <tr><td><code>num_leaves</code></td><td>31</td><td>Стандарт для предотвращения переобучения</td></tr>
+        <tr><td><code>subsample</code></td><td>0.8</td><td>Стохастическая регуляризация</td></tr>
+        <tr><td><code>colsample_bytree</code></td><td>0.8</td><td>Регуляризация по признакам</td></tr>
+        <tr><td><code>reg_alpha / reg_lambda</code></td><td>0.1 / 0.1</td><td>L1/L2 регуляризация</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Результаты -->
+  <h3>6.3 Результаты прогноза</h3>
+  <div class="kpi-strip">
+    <div class="kpi-item"><div class="num" style="color:var(--accent);">1.13°C</div><div class="lbl">MAE (Test)</div></div>
+    <div class="kpi-item"><div class="num" style="color:var(--accent4);">1.47°C</div><div class="lbl">RMSE (Test)</div></div>
+    <div class="kpi-item"><div class="num" style="color:var(--accent2);">3.81%</div><div class="lbl">MAPE</div></div>
+    <div class="kpi-item"><div class="num" style="color:var(--accent3);">−44.7%</div><div class="lbl">Δ vs Naive</div></div>
+  </div>
+
+  <div class="fig">
+    <figure>
+      <img src="https://raw.githubusercontent.com/AlexeyN48/Time_series-practices/main/forecast_plot.png" alt="Прогноз vs факт">
+      <figcaption>Прогноз vs факт: LightGBM (MAE=1.13°C) vs SeasonalNaive (MAE=2.05°C)</figcaption>
+    </figure>
+  </div>
+
+  <h3>6.4 Важность признаков</h3>
+  <div class="fig">
+    <figure>
+      <img src="https://raw.githubusercontent.com/AlexeyN48/Time_series-practices/main/feature_importance.png" alt="Feature Importance">
+      <figcaption>Топ-3: humidity, lag_1, meanpressure — доминирующие предикторы</figcaption>
+    </figure>
+  </div>
+
+  <!-- Тесты -->
+  <h3>6.5 Статистическое тестирование</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Тест</th><th>Статистика</th><th>p-значение</th><th>H₀</th><th>Вывод</th></tr></thead>
+      <tbody>
+        <tr><td>Льюнга–Бокса (lag=10)</td><td>23.738</td><td>0.0083</td><td>Белый шум</td><td style="color:var(--accent3);font-weight:600;">❌ Отвергается</td></tr>
+        <tr><td>Диболда–Мариано</td><td>n/a</td><td>n/a</td><td>LGBM ≡ Naive</td><td style="color:var(--gold);font-weight:600;">⚠️ Мала мощность</td></tr>
+        <tr><td>Шапиро–Уилка</td><td>0.9595</td><td>0.3016</td><td>Нормальность</td><td style="color:var(--accent2);font-weight:600;">✅ Не отвергается</td></tr>
+        <tr><td>Bias (t-test)</td><td>−0.3604</td><td>0.7212</td><td>Bias = 0</td><td style="color:var(--accent2);font-weight:600;">✅ Не отвергается</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-cool">
+    <strong>Интерпретация:</strong> Остатки нормальны (SW p=0.302), модель несмещена (bias = −0.10°C, p=0.72). Тест Льюнга–Бокса обнаружил автокорреляцию на лагах 5–15 — указывает на неучтённые нелинейные взаимодействия экзогенных переменных.
+  </div>
+
+  <div class="fig">
+    <figure>
+      <img src="https://raw.githubusercontent.com/AlexeyN48/Time_series-practices/main/residual_analysis.png" alt="Анализ остатков">
+      <figcaption>Остатки: временной ряд, гистограмма, Q-Q plot, ACF</figcaption>
+    </figure>
+  </div>
+
+  <!-- Производительность -->
+  <h3>6.6 Тестирование производительности</h3>
+  <div class="kpi-strip">
+    <div class="kpi-item"><div class="num" style="font-size:1.4rem;color:var(--accent4);">223.5 мс</div><div class="lbl">Обучение</div></div>
+    <div class="kpi-item"><div class="num" style="font-size:1.4rem;color:var(--accent2);">1.12 мс</div><div class="lbl">Инференс</div></div>
+    <div class="kpi-item"><div class="num" style="font-size:1.4rem;color:var(--accent);">30 302/с</div><div class="lbl">Пропускная сп-ть</div></div>
+    <div class="kpi-item"><div class="num" style="font-size:1.4rem;color:var(--accent3);">~4 MB</div><div class="lbl">Пик. память</div></div>
+  </div>
+
+  <div class="fig">
+    <figure>
+      <img src="https://raw.githubusercontent.com/AlexeyN48/Time_series-practices/main/performance_benchmark.png" alt="Бенчмарк">
+      <figcaption>Бенчмарк: время обучения, инференс, масштабируемость</figcaption>
+    </figure>
+  </div>
+
+  <!-- Рекомендации -->
+  <h3>6.7 Рекомендации для улучшения</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Направление</th><th>Действие</th><th>Ожидаемый эффект</th></tr></thead>
+      <tbody>
+        <tr><td>Гиперпараметры</td><td>Optuna / Bayesian optimization</td><td>−5…15% MAE</td></tr>
+        <tr><td>Признаки</td><td>Синусоидальное кодирование dayofyear</td><td>Лучше сезонность</td></tr>
+        <tr><td>Экзогенные данные</td><td>Прогнозы влажности и давления</td><td>−10…20% MAE</td></tr>
+        <tr><td>Ансамблирование</td><td>MSTL + LightGBM (stacking)</td><td>Снижение дисперсии</td></tr>
+        <tr><td>Квантильный прогноз</td><td>LGBMRegressor(objective='quantile')</td><td>Доверит. интервалы</td></tr>
+        <tr><td>Мониторинг</td><td>PSI / ADWIN для дрейфа</td><td>Надёжность в продакшне</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Итог -->
+  <h3>6.8 Общие выводы</h3>
+  <div class="callout callout-warm">
+    <p>Проведён комплексный анализ ВР среднесуточной температуры в Дели (2013–2017): полный цикл от EDA до production-пайплайна.</p>
+    <p>Сравнение 13 методов показало: <strong>LightGBM с грамотным feature engineering</strong> достигает лучшей точности (MAE = 1.13°C, −44.7% над бейзлайном). DL-методы уступают ML из-за малого объёма данных (~1500 точек). Статистические методы — сильный бейзлайн для структурированных сезонных рядов.</p>
+    <p>Анализ аномалий (IQR, Isolation Forest, DBSCAN) подтверждает: наилучший результат при консенсусном подходе (≥2 методов).</p>
+    <p style="margin-bottom:0;"><strong>Ключевой вывод:</strong> эффективность прогнозирования определяется не только выбором модели, но и качеством подготовки данных, учётом сезонности и инженерией признаков.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>Исследование временного ряда · Погода в Дели (2013–2017)</p>
+  <a href="https://github.com/AlexeyN48/Time_series-practices" target="_blank" class="foot-gh">
+    <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    GitHub Repository
+  </a>
+  <p>statsforecast · mlforecast · neuralforecast · scikit-learn · LightGBM</p>
+</footer>
+
+</body>
+</html>
